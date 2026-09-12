@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- 单路调试：只开一台相机，便于定位问题。
+     例：roslaunch smart_interception_camera single_cam.launch device:=/dev/video2 ns:=cam_left
+     话题：/$(arg ns)/image_raw -->
+<launch>
+  <arg name="device"       default="/dev/video2"/>
+  <arg name="ns"           default="cam_left"/>
+  <arg name="width"        default="640"/>
+  <arg name="height"       default="480"/>
+  <arg name="framerate"    default="30"/>
+  <arg name="pixel_format" default="mjpeg"/>
+
+  <node name="$(arg ns)" pkg="usb_cam" type="usb_cam_node" output="screen">
+    <param name="video_device"     value="$(arg device)"/>
+    <param name="io_method"        value="mmap"/>
+    <param name="image_width"      value="$(arg width)"/>
+    <param name="image_height"     value="$(arg height)"/>
+    <param name="framerate"        value="$(arg framerate)"/>
+    <param name="pixel_format"     value="$(arg pixel_format)"/>
+    <param name="camera_name"      value="$(arg ns)"/>
+    <param name="camera_frame_id"  value="$(arg ns)"/>
+  </node>
+</launch>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- M0 验收：两路同时出帧。
+     设备：外接① HD 720P Webcam = /dev/video2，外接② USB Camera = /dev/video4。
+     默认 MJPG 640x480@30，降低共用 USB2 总线的带宽压力。
+     usb_cam 把 image_raw 发在节点名命名空间下，故节点名即相机名：
+     话题 /cam_left/image_raw + /cam_right/image_raw -->
+<launch>
+  <arg name="left_device"  default="/dev/video2"/>
+  <arg name="right_device" default="/dev/video4"/>
+  <arg name="width"        default="640"/>
+  <arg name="height"       default="480"/>
+  <arg name="framerate"    default="30"/>
+  <arg name="pixel_format" default="mjpeg"/>
+
+  <node name="cam_left" pkg="usb_cam" type="usb_cam_node" output="screen">
+    <param name="video_device"     value="$(arg left_device)"/>
+    <param name="io_method"        value="mmap"/>
+    <param name="image_width"      value="$(arg width)"/>
+    <param name="image_height"     value="$(arg height)"/>
+    <param name="framerate"        value="$(arg framerate)"/>
+    <param name="pixel_format"     value="$(arg pixel_format)"/>
+    <param name="camera_name"      value="cam_left"/>
+    <param name="camera_frame_id"  value="cam_left"/>
+  </node>
+
+  <node name="cam_right" pkg="usb_cam" type="usb_cam_node" output="screen">
+    <param name="video_device"     value="$(arg right_device)"/>
+    <param name="io_method"        value="mmap"/>
+    <param name="image_width"      value="$(arg width)"/>
+    <param name="image_height"     value="$(arg height)"/>
+    <param name="framerate"        value="$(arg framerate)"/>
+    <param name="pixel_format"     value="$(arg pixel_format)"/>
+    <param name="camera_name"      value="cam_right"/>
+    <param name="camera_frame_id"  value="cam_right"/>
+  </node>
+</launch>

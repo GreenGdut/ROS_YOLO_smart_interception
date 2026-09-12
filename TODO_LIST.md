@@ -33,7 +33,7 @@ MVP 场地固定，用固定外参把拦截点映射到地面系；小车端只�
 
 ## 里程碑推进清单
 
-- [ ] **M0 环境就绪**：Noetic、双 USB 相机架设（宽基线）、catkin 工作区 + rosserial。验收：能同时采到两路帧。
+- [x] **M0 环境就绪**：Noetic、双 USB 相机架设（宽基线）、catkin 工作区 + rosserial。验收：能同时采到两路帧。✅ 2026-09-10：双路 MJPG 640x480@30 稳定出帧（`/cam_left/image_raw`、`/cam_right/image_raw`，节点 `smart_interception_camera`）。
 - [ ] **M1 棋盘立体标定**：内参、基线、校正映射。验收：重投影误差达标。
 - [ ] **M2 检测**：先 HSV 跑通链路，YOLO 小数据训练后接管为主、HSV 兜底。验收：左右目都稳定出球心。
 - [ ] **M3 三角化 3D 定位**。验收：静态球 2/3/4m 误差在预算内。
@@ -54,3 +54,4 @@ MVP 场地固定，用固定外参把拦截点映射到地面系；小车端只�
 ## 决策记录（迭代追加）
 
 - **2026-09-08**：球为单一橙色乒乓球；双目用两颗独立 USB 相机宽基线；检测 YOLO(主)+HSV(兜底)；预测物理先行、NN(仿真训练)后置热插拔；拦截=车顶钢板接下坠球（2D 问题）；抛距 3–5m；底盘 TT 编码器电机+四驱麦轮+电机拓展板；上位机与小车为两个 ROS Noetic 通信节点(rosserial)。
+- **2026-09-10**：M0 落地——容器挂载项目 `catkin_ws`，`/dev/video*` 透传进容器（compose `devices` + `group_add` video gid）；相机映射 video2=左(HD 720P Webcam)、video4=右(USB Camera)，`usb_cam` 双路 640x480 MJPG@30，话题 `cam_left|right/image_raw`（usb_cam 话题在节点命名空间下）；launch 包 `smart_interception_camera`。

@@ -1,0 +1,27 @@
+# catkin 工作区生成物（只提交 catkin_ws/src）
+catkin_ws/build/
+catkin_ws/devel/
+catkin_ws/install/
+catkin_ws/logs/
+catkin_ws/.catkin_tools/
+catkin_ws/.catkin_workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.swp
+
+# 系统
+.DS_Store
+
+# 运行产物
+*.bag
+*.log
+outputs/

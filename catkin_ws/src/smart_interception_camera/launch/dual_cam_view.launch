@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- M0 验收一条命令：双路采集 + 两路实时窗口（image_view，需有 X11 DISPLAY）。 -->
+<launch>
+  <include file="$(find smart_interception_camera)/launch/dual_cam.launch"/>
+
+  <node name="view_left" pkg="image_view" type="image_view" output="screen">
+    <remap from="image" to="/cam_left/image_raw"/>
+    <param name="window_name" value="cam_left"/>
+  </node>
+
+  <node name="view_right" pkg="image_view" type="image_view" output="screen">
+    <remap from="image" to="/cam_right/image_raw"/>
+    <param name="window_name" value="cam_right"/>
+  </node>
+</launch>
