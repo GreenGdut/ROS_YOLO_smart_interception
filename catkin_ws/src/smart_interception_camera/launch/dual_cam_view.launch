@@ -6,10 +6,12 @@
   <node name="view_left" pkg="image_view" type="image_view" output="screen">
     <remap from="image" to="/cam_left/image_raw"/>
     <param name="window_name" value="cam_left"/>
+    <param name="autosize" value="false" />
   </node>
 
   <node name="view_right" pkg="image_view" type="image_view" output="screen">
     <remap from="image" to="/cam_right/image_raw"/>
     <param name="window_name" value="cam_right"/>
+    <param name="autosize" value="false" />	    
   </node>
 </launch>

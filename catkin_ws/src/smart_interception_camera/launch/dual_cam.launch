@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
-<!-- M0 验收：两路同时出帧。
-     设备：外接① HD 720P Webcam = /dev/video2，外接② USB Camera = /dev/video4。
-     默认 MJPG 640x480@30，降低共用 USB2 总线的带宽压力。
-     usb_cam 把 image_raw 发在节点名命名空间下，故节点名即相机名：
-     话题 /cam_left/image_raw + /cam_right/image_raw -->
+<!-- M1 标定完成：两路出帧 + camera_info（内参/畸变/双目矫正矩阵）。
+     设备：/dev/video2 = HD 720P Webcam（物理左，cam_left）、/dev/video4 = USB Camera（物理右，cam_right）。
+     标定基于 YUYV 1280x720，内参只绑分辨率不绑压缩格式，运行默认 MJPG 1280x720@30。
+     重新标定时用: pixel_format:=yuyv framerate:=10
+     ⚠ 相机物理位置不可再动，动了外参作废。
+     usb_cam 把 image_raw 发在节点名命名空间下，话题 /cam_left/image_raw + /cam_right/image_raw -->
 <launch>
   <arg name="left_device"  default="/dev/video2"/>
   <arg name="right_device" default="/dev/video4"/>
-  <arg name="width"        default="640"/>
-  <arg name="height"       default="480"/>
+  <arg name="width"        default="1280"/>
+  <arg name="height"       default="720"/>
   <arg name="framerate"    default="30"/>
   <arg name="pixel_format" default="mjpeg"/>
 
@@ -21,6 +22,7 @@
     <param name="pixel_format"     value="$(arg pixel_format)"/>
     <param name="camera_name"      value="cam_left"/>
     <param name="camera_frame_id"  value="cam_left"/>
+    <param name="camera_info_url"  value="file:///catkin_ws/src/smart_interception_camera/config/cam_left_camera_info.yaml"/>
   </node>
 
   <node name="cam_right" pkg="usb_cam" type="usb_cam_node" output="screen">
@@ -32,5 +34,6 @@
     <param name="pixel_format"     value="$(arg pixel_format)"/>
     <param name="camera_name"      value="cam_right"/>
     <param name="camera_frame_id"  value="cam_right"/>
+    <param name="camera_info_url"  value="file:///catkin_ws/src/smart_interception_camera/config/cam_right_camera_info.yaml"/>
   </node>
 </launch>

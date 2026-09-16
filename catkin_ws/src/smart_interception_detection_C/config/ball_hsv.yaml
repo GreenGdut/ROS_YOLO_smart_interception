@@ -1,0 +1,25 @@
+# M2 检测参数（C++ 版），与 Python 版一致；后续逐帧离线微调。
+hsv:
+  h_min: 5
+  h_max: 28
+  s_min: 120
+  s_max: 255
+  v_min: 140
+  v_max: 255
+
+shape:
+  min_area: 1500
+  max_area: 400000
+  min_circularity: 0.6
+  min_fill: 0.6
+  morph_kernel: 7
+
+display:
+  scale: 0.45
+  show: true
+
+trail:
+  max_points: 60   # 点迹缓冲容量，满了丢最旧；0=关闭
+  show: true
+
+source: "/cam_left/image_raw"
