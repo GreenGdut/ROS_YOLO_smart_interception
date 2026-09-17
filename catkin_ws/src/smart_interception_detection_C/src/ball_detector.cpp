@@ -9,6 +9,8 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstdio>
+#include <string>
 #include <vector>
 
 namespace smart_interception {
@@ -28,9 +30,10 @@ inline double msSince(const Clock::time_point& a, const Clock::time_point& b) {
 // 输出  out     成功时为最优候选（球心/半径为原图像素坐标，M3 直接用）
 //       mask    调试用：最终二值掩膜（形态学之后）
 //       timings 可选，各阶段耗时(ms)
+//       rejects 可选，被筛掉轮廓的原因（简短英文，仅调试窗口用，终端不打印）
 // 返回  是否检出
 bool BallDetector::detect(const cv::Mat& bgr, Detection& out, cv::Mat& mask,
-                          Timings* timings) const {
+                          Timings* timings, std::vector<std::string>* rejects) const {
   Clock::time_point t0 = Clock::now();
 
   cv::Mat hsv;
@@ -52,22 +55,47 @@ bool BallDetector::detect(const cv::Mat& bgr, Detection& out, cv::Mat& mask,
   Clock::time_point t4 = Clock::now();
 
   bool found = false;
+  char buf[64];
+  // 被筛掉的原因写入 rejects（未传则零开销），供调试窗口显示，便于定位调参方向。
+  const bool want_rejects = (rejects != nullptr);
+  auto note = [&](const char* text) {
+    if (want_rejects) rejects->push_back(text);
+  };
+
+  if (contours.empty()) note("no contour");
+
   for (const auto& c : contours) {
     double area = cv::contourArea(c);
-    if (area < p_.min_area || area > p_.max_area) continue;
+    if (area < p_.min_area || area > p_.max_area) {
+      snprintf(buf, sizeof(buf), "A %.0f %s %.0f", area, area < p_.min_area ? "<" : ">",
+               area < p_.min_area ? p_.min_area : p_.max_area);
+      note(buf);
+      continue;
+    }
 
     double perimeter = cv::arcLength(c, true);
-    if (perimeter <= 0.0) continue;
+    if (perimeter <= 0.0) {
+      note("P<=0");
+      continue;
+    }
 
     double circularity = 4.0 * M_PI * area / (perimeter * perimeter);
-    if (circularity < p_.min_circularity) continue;
+    if (circularity < p_.min_circularity) {
+      snprintf(buf, sizeof(buf), "C %.2f < %.2f", circularity, p_.min_circularity);
+      note(buf);
+      continue;
+    }
 
     cv::Point2f center;
     float radius = 0.0f;
     cv::minEnclosingCircle(c, center, radius);
     double circle_area = M_PI * static_cast<double>(radius) * static_cast<double>(radius);
     double fill = circle_area > 0.0 ? area / circle_area : 0.0;
-    if (fill < p_.min_fill) continue;
+    if (fill < p_.min_fill) {
+      snprintf(buf, sizeof(buf), "F %.2f < %.2f", fill, p_.min_fill);
+      note(buf);
+      continue;
+    }
 
     if (!found || area > out.area) {
       out.cx = center.x;

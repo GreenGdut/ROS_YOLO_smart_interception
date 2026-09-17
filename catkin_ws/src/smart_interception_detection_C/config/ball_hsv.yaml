@@ -1,4 +1,5 @@
 # M2 检测参数（C++ 版），与 Python 版一致；后续逐帧离线微调。
+# hsv 各项均可被命令行参数覆盖：--H_min --H_max --S_min --S_max --V_min --V_max。
 hsv:
   h_min: 5
   h_max: 28
@@ -7,11 +8,15 @@ hsv:
   v_min: 140
   v_max: 255
 
+preproc:
+  # BGR 整体亮度线性增益（1.0=不变，>1 提亮且高光在 255 饱和）；命令行 --V_scale 覆盖。
+  V_scale: 1.0
+
 shape:
-  min_area: 1500
-  max_area: 400000
-  min_circularity: 0.6
-  min_fill: 0.6
+  min_area: 1500        # 轮廓面积下限(px^2)，命令行 --A_min 覆盖
+  max_area: 400000      # 轮廓面积上限，命令行 --A_max 覆盖
+  min_circularity: 0.6  # 圆度下限(0-1)，命令行 --C_min 覆盖
+  min_fill: 0.6         # 填充率下限(0-1)，命令行 --F_min 覆盖
   morph_kernel: 7
 
 display:
